@@ -14,7 +14,12 @@ const userSchema = mongoose.Schema({
         required: [true, 'Please add an password']
     },
     farmer: {
-        type: Boolean
+        type: Boolean,
+        default: false
+    },
+    profileImg: {
+        type: Buffer,
+        contentType: String
     }
 
 }, {

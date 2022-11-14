@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
+const User = require('../models/userModel')
 
 //@desc Get all products
 //@route GET /api/products
@@ -31,11 +32,11 @@ const createProduct = asyncHandler(async (req, res) => {
         name: req.body.name,
         price: req.body.price,
         description: req.body.description,
-        image: {
+        productImage: {
             data: req.file.filename,
             contentType: 'image/png'
-        }
-        // user: req.user.id
+        },
+        user: req.user.id
     })
 
     res.status(200).json(product)
@@ -47,7 +48,7 @@ const createProduct = asyncHandler(async (req, res) => {
 const updateProduct = asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id)
 
-    //const user = await User.findById(req.user.id)
+    const user = await User.findById(req.user.id)
 
     //Verify if product exists
     if(!product) {
@@ -56,16 +57,16 @@ const updateProduct = asyncHandler(async (req, res) => {
     }
 
     //Check for user
-    // if(!user) {
-    //     res.status(401)
-    //     throw new Error('User not found')
-    // }
+    if(!user) {
+        res.status(401)
+        throw new Error('User not found')
+    }
 
     //Make sure the logged user maches the product user
-    // if(goal.user.toString() !== user.id) {
-    //     res.status(401)
-    //     throw new Error('User not authorized')
-    // }
+    if(product.user.toString() !== user.id) {
+        res.status(401)
+        throw new Error('User not authorized')
+    }
 
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id,
         req.body, {

@@ -13,9 +13,14 @@ const productSchema = mongoose.Schema(
             type: Number,
             required: true
         },
-        image: {
+        productImage: {
             data: Buffer,
             contentType: String
+        },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'User'
         }
     },
     {
