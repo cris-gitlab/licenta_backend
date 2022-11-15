@@ -32,11 +32,8 @@ const createProduct = asyncHandler(async (req, res) => {
         name: req.body.name,
         price: req.body.price,
         description: req.body.description,
-        productImage: {
-            data: req.file.filename,
-            contentType: 'image/png'
-        },
-        user: req.user.id
+        productImage: req.file.filename,
+        producer: req.user.id
     })
 
     res.status(200).json(product)
@@ -63,7 +60,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     }
 
     //Make sure the logged user maches the product user
-    if(product.user.toString() !== user.id) {
+    if(product.producer.toString() !== user.id) {
         res.status(401)
         throw new Error('User not authorized')
     }

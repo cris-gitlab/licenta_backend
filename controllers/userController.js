@@ -10,7 +10,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const {name, email, password} = req.body
     if(!name || !email || !password) {
         res.status(400)
-        throw new Error('Please add all fields')
+        throw new Error('Complete all fields')
     }
 
     //Check if user exists
@@ -29,7 +29,8 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        profileImg: null
     })
 
     if(user) {
@@ -37,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
-            token: generateToken(user._id)
+            token: generateToken(user._id),
         })
     } else {
         res.status(400)
@@ -80,15 +81,37 @@ const loginUser = asyncHandler(async (req, res) => {
 //@route GET /api/users/me
 //@access Private
 const getMe = asyncHandler(async (req, res) => {
-    const {_id, name, email} = await User.findById(req.user.id)
+    const {_id, name, email, farmer, profileImg} = await User.findById(req.user.id)
 
     res.status(200).json({
         id: _id,
         name,
         email,
+        farmer,
+        profileImg,
         request: req.user
     })
 });
+
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id)
+
+    if(!user) {
+        res.status(401)
+        throw new Error('User not found')
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id,
+        {
+            name: req.body.name,
+            profileImg: req.body.profileImg,
+            farmer:req.body.farmer,
+            password: req.body.password
+        }, 
+        {new:true})
+
+    res.status(200).json({updatedUser})
+})
 
 // Generate JWT
 const generateToken = (id) => {
@@ -97,8 +120,26 @@ const generateToken = (id) => {
     })
 }
 
+//@desc Delete user
+//@route DELETE /api/users
+//@access Private
+const deleteUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id)
+
+    if(!user) {
+        res.status(400)
+        throw new Error('User not found')
+    }
+
+    await user.remove()
+
+    res.status(200).json({id: req.params.id})
+})
+
 module.exports = {
   registerUser,
   loginUser,
   getMe,
+  updateUser,
+  deleteUser
 };
