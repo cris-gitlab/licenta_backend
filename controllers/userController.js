@@ -3,6 +3,22 @@ const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 
+//@desc Get all users
+//@route Get /api/users
+//@access Private
+const getAllUsers = asyncHandler(async (req, res) => {
+    const users = await User.find()
+    res.status(200).json(users)
+})
+
+//@desc Get public user information
+//@route Get /api/users/:id
+//@access Public
+const getUser  = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select("-password")
+    res.status(200).json(user)
+})
+
 //@desc Register new user
 //@route POST /api/users
 //@access Public
@@ -93,6 +109,10 @@ const getMe = asyncHandler(async (req, res) => {
     })
 });
 
+
+//@desc Update user data
+//@route PUT /api/users/:id
+//@access Private
 const updateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id)
 
@@ -137,9 +157,11 @@ const deleteUser = asyncHandler(async (req, res) => {
 })
 
 module.exports = {
+  getAllUsers,
   registerUser,
   loginUser,
   getMe,
   updateUser,
-  deleteUser
+  deleteUser,
+  getUser,
 };
