@@ -14,7 +14,7 @@ const { protect } = require("../middleware/authmiddleware");
 const uploadProfile = require("../middleware/imgMiddleware");
 //const { publicUser } = require("../middleware/publicmiddleware")
 
-router.post("/", registerUser).get("/", getAllUsers);
+router.post("/",uploadProfile('profile').single('profileImg') ,registerUser).get("/", getAllUsers);
 router.post("/login", loginUser);
 router.get("/me", protect, getMe);
 router.get("/:id",  getUser)

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
+const fs = require("fs")
 
 //@desc Get all users
 //@route Get /api/users
@@ -26,7 +27,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const {name, email, password} = req.body
     if(!name || !email || !password) {
         res.status(400)
-        throw new Error('Complete all fields')
+        throw new Error('Complete all fields ' + name + email + password)
     }
 
     //Check if user exists
@@ -46,7 +47,11 @@ const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        profileImg: null
+        profileImg: {
+            data: fs.readFileSync("uploads/profile/" + req.file.filename),
+            contentType: "image/png"
+        }
+
     })
 
     if(user) {

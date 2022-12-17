@@ -14,8 +14,8 @@ const productSchema = mongoose.Schema(
             required: true
         },
         productImage: {
-            type: String,
-            required: true
+            data: Buffer,
+            contentType: String
         },
         producer: {
             type: mongoose.Schema.Types.ObjectId,
