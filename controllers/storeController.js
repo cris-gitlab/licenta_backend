@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const Store = require('../models/storeModel')
 const User = require('../models/userModel')
+const fs = require("fs")
 
 //@desc Get all stores
 //@route GET /api/stores
@@ -8,6 +9,13 @@ const User = require('../models/userModel')
 const getStores = asyncHandler(async (req, res) => {
     const stores = await Store.find()
     res.status(200).json(stores)
+})
+
+//@desc Get public store information
+//@route GET /api/stores/:id
+const getStore  = asyncHandler(async (req, res) => {
+    const store = await Store.findById(req.params.id)
+    res.status(200).json(store)
 })
 
 // @desc Create Store
@@ -22,7 +30,10 @@ const createStore = asyncHandler(async (req, res) => {
     const store = await Store.create({
         name: req.body.name,
         description: req.body.description,
-        storeImg: req.file.filename,
+        address: req.body.address,
+        storeImg: {//req.file.filename
+            data: fs.readFileSync("uploads/stores/" + req.file.filename),
+            contentType: "image/png"},
         owner: req.user.id
     })
 
@@ -78,6 +89,7 @@ const deleteStore = asyncHandler(async (req, res) => {
 
 module.exports = {
     getStores,
+    getStore,
     createStore,
     updateStore,
     deleteStore
