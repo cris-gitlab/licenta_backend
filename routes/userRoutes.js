@@ -20,7 +20,7 @@ router.get("/me", protect, getMe);
 router.get("/:id",  getUser)
 router
   .route("/:id")
-  .put(protect, uploadProfile("profile").single("profileImg"), updateUser)
+  .patch(protect, uploadProfile("profile").single("profileImg"), updateUser)
   .delete(protect, deleteUser);
 
 module.exports = router;

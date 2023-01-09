@@ -6,6 +6,7 @@ const {
   updateStore,
   deleteStore,
   getStore,
+  getMyStore,
 } = require("../controllers/storeController");
 
 const uploadImg = require("../middleware/imgMiddleware");
@@ -20,4 +21,8 @@ router
   .get(getStore)
   .put(protect, uploadImg("stores").single("storeImg"), updateStore)
   .delete(protect, deleteStore);
+router
+  .route("/mine/:id")
+  .get(protect, getMyStore)
+  .patch(protect, updateStore)
 module.exports = router;

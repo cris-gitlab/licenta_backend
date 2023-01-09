@@ -18,9 +18,10 @@ const storeSchema = mongoose.Schema(
       contentType: String,
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
+      //type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "User",
+      //ref: "User",
     },
   },
   {

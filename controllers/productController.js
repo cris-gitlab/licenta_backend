@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
 const User = require('../models/userModel')
+const Store = require('../models/storeModel')
 
 //@desc Get all products
 //@route GET /api/products
@@ -10,14 +11,28 @@ const getProducts = asyncHandler(async (req, res) => {
     res.status(200).json(products)
 })
 
+//@desc Get a product
+//@route GET /api/products/:id
+const getProductInfo = asyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id)
+    res.status(200).json(product)
+})
+
 //@desc Get all products created by logged user
-//@route GET /api/products/:userid
+//@route GET /api/products/me
 //@acces Private
+const getMyProducts = asyncHandler(async (req, res) => {
+    const products = await Product.find({ producer: req.user.id })
+  
+    res.status(200).json(products)
+  })
 
 // @desc Create Product
 // @route POST /api/products
 // @access Private
 const createProduct = asyncHandler(async (req, res) => {
+    const store = await Store.findOne({ owner: req.user.id });
+
     if(!req.body.name) {   
      res.status(400)
      throw new Error('Prease add a name for product')
@@ -33,8 +48,9 @@ const createProduct = asyncHandler(async (req, res) => {
         price: req.body.price,
         description: req.body.description,
         category: req.body.category,
-        productImage: req.file.filename,
-        producer: req.user.id
+        //productImage: req.file.filename,
+        producer: req.user.id,
+        store: store.id
     })
 
     res.status(200).json(product)
@@ -71,7 +87,11 @@ const updateProduct = asyncHandler(async (req, res) => {
             new: true,
         })
 
-    res.status(200).json(updatedProduct)
+        if(updateProduct) {
+            res.status(200).json(updatedProduct)
+        } else {
+            res.status(404).json(req.body)
+        }
 })
 
 // @desc Delete product
@@ -108,6 +128,8 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 module.exports = {
     getProducts,
+    getProductInfo,
+    getMyProducts,
     createProduct,
     updateProduct,
     deleteProduct,
