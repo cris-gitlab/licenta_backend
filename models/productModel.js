@@ -17,10 +17,10 @@ const productSchema = mongoose.Schema(
             type: Number,
             required: true
         },
-        // productImage: {
-        //     data: Buffer,
-        //     contentType: String
-        // },
+        productImage: {
+            data: Buffer,
+            contentType: String
+        },
         producer: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,

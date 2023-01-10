@@ -61,6 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      profileImg: user.profileImg,
       token: generateToken(user._id),
     });
   } else {
@@ -126,19 +127,23 @@ const updateUser = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-//   profileImg: {
-//     //data: fs.readFileSync("uploads/profile/" + req.file.filename),
-//     //data: null,
-//     data: fs.readFileSync("uploads/profile/" + defaultProfilePic),
-//     contentType: "image/png",
-//   },
+  //   profileImg: {
+  //     //data: fs.readFileSync("uploads/profile/" + req.file.filename),
+  //     //data: null,
+  //     data: fs.readFileSync("uploads/profile/" + defaultProfilePic),
+  //     contentType: "image/png",
+  //   },
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
     {
       // _id: user.id,
       name: req.body.name,
-      farmer: req.body.farmer
+      farmer: req.body.farmer,
+      profileImg: {
+        data: fs.readFileSync("uploads/profile/" + req.file.filename),
+        contentType: "image/png",
+      },
       //profileImg: req.body.profileImg,
       // farmer:user.farmer,
       // password: user.password
@@ -152,18 +157,16 @@ const updateUser = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  res
-    .status(200)
-    .json({
-      _id: updatedUser.id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      farmer: updatedUser.farmer,
-      profileImg: updatedUser.profileImg,
-      token: generateToken(updatedUser._id),
-      // body: req.body,
-      // file: req.file
-    });
+  res.status(200).json({
+    _id: updatedUser.id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    farmer: updatedUser.farmer,
+    profileImg: updatedUser.profileImg,
+    token: generateToken(updatedUser._id),
+    // body: req.body,
+    // file: req.file
+  });
 });
 
 // Generate JWT

@@ -21,6 +21,9 @@ const userSchema = mongoose.Schema({
         data: Buffer,
         contentType: String
     }
+    // profileImg: {
+    //     type: Object
+    // }
 
 }, {
     timpestamps: true

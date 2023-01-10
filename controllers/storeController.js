@@ -45,12 +45,25 @@ const updateStore = asyncHandler(async (req, res) => {
     throw new Error("Store not found");
   }
 
+  // let storePicture;
+  // if (req.file) {
+  //   storePicture = req.file.filename;
+  // } else {
+  //   storePicture = defaultStorePic;
+  // }
+
   const updatedStore = await Store.findByIdAndUpdate(
     store.id,
     {
       name: req.body.name,
       description: req.body.description,
       address: req.body.address,
+      ...((req.file !== undefined) && {
+        storeImg: {
+          data: fs.readFileSync("uploads/stores/" + req.file.filename),
+          contentType: "image/png",
+        },
+      }),
     },
     { new: true }
   );
@@ -65,6 +78,7 @@ const updateStore = asyncHandler(async (req, res) => {
       description: updatedStore.description,
       storeImg: updatedStore.storeImg,
       owner: updatedStore.owner,
+      body: req.file
     });
   }
 });
@@ -87,17 +101,22 @@ const createStore = asyncHandler(async (req, res) => {
     description = req.body.description;
   }
 
+  let storePicture;
+  if (req.file) {
+    storePicture = req.file.filename;
+  } else {
+    storePicture = defaultStorePic;
+  }
+
   const store = await Store.create({
     name: req.body.name,
     description: description,
     address: req.body.address,
     storeImg: {
-      //req.file.filename
-      //data: fs.readFileSync("uploads/stores/" + req.file.filename),
-      data: fs.readFileSync("uploads/stores/" + defaultStorePic),
+      data: fs.readFileSync("uploads/stores/" + storePicture),
       contentType: "image/png",
     },
-    owner: req.user.id.toString(), //JSON.stringify(req.user.id)
+    owner: req.user.id.toString(),
   });
 
   res.status(200).json(store);

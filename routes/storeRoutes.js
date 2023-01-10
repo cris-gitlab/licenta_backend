@@ -24,5 +24,5 @@ router
 router
   .route("/mine/:id")
   .get(protect, getMyStore)
-  .patch(protect, updateStore)
+  .patch(protect, uploadImg("stores").single("storeImg"), updateStore)
 module.exports = router;
