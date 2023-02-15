@@ -4,11 +4,16 @@ const User = require("../models/userModel");
 const Store = require("../models/storeModel");
 const fs = require("fs");
 
-//@desc Get all products
+//@desc Get all products or by category
 //@route GET /api/products
 //@acces Public
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find();
+  let products
+  if(req.body.category === 'all'){
+    products = await Product.find();
+  } else {
+    products = await Product.find({category: req.body.category});
+  }
   res.status(200).json(products);
 });
 

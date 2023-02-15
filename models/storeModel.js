@@ -23,6 +23,11 @@ const storeSchema = mongoose.Schema(
       required: true,
       //ref: "User",
     },
+    active: {
+      type: Boolean,
+      default: false
+    },
+    list : {type: [{name: {type: String, required: true}, address: {type: String, required: true}}]}
   },
   {
     timestamps: true,

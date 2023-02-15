@@ -14,14 +14,15 @@ const { protect } = require("../middleware/authmiddleware");
 
 router
   .route("/")
-  .get(getProducts)
+//.get(getProducts)
   .post(protect, uploadProd("products").single("productImg"), createProduct);
-  //.post(protect, uploadProd("products").array("productImg"), createProduct);
+//.post(protect, uploadProd("products").array("productImg"), createProduct);
 router
   .route("/:id")
   .get(getProductInfo)
   .patch(protect, uploadProd("products").single("productImg"), updateProduct)
   //.put(protect, updateProduct)
   .delete(protect, deleteProduct);
+router.route("/category").post(getProducts);
 router.route("/myProducts/me").get(protect, getMyProducts);
 module.exports = router;

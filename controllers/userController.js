@@ -88,7 +88,40 @@ const loginUser = asyncHandler(async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        farmer: user.farmer,
+        role: user.role,
+        profileImg: user.profileImg,
+        token: generateToken(user._id),
+      });
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  }
+});
+
+//@desc Authenticate a user
+//@route POST /api/admin/loginAdmin
+//@access Public
+const loginAdmin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  //Check for data completion
+  if (!email || !password) {
+    throw new Error("Complete all fields");
+  } else {
+    //Check for user email
+    const user = await User.findOne({ email });
+
+    if(user.role !== 'admin') {
+      res.status(401)
+      throw new Error('You are not an admin')
+    }
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
         profileImg: user.profileImg,
         token: generateToken(user._id),
       });
@@ -102,7 +135,7 @@ const loginUser = asyncHandler(async (req, res) => {
 //@route GET /api/users/me
 //@access Private
 const getMe = asyncHandler(async (req, res) => {
-  const { _id, name, email, farmer, profileImg } = await User.findById(
+  const { _id, name, email, role, profileImg } = await User.findById(
     req.user.id
   );
 
@@ -110,7 +143,7 @@ const getMe = asyncHandler(async (req, res) => {
     id: _id,
     name,
     email,
-    farmer,
+    role,
     profileImg,
     request: req.user,
   });
@@ -134,38 +167,48 @@ const updateUser = asyncHandler(async (req, res) => {
   //     contentType: "image/png",
   //   },
 
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user.id,
-    {
-      // _id: user.id,
-      name: req.body.name,
-      farmer: req.body.farmer,
-      profileImg: {
-        data: fs.readFileSync("uploads/profile/" + req.file.filename),
-        contentType: "image/png",
-      },
-      //profileImg: req.body.profileImg,
-      // farmer:user.farmer,
-      // password: user.password
+  let updatedUser;
+  if (req.file) {
+    updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        // _id: user.id,
+        name: req.body.name,
+        role: req.body.role,
+        profileImg: {
+          data: fs.readFileSync("uploads/profile/" + req.file.filename),
+          contentType: "image/png",
+        },
+        //profileImg: req.body.profileImg,
+        // farmer:user.farmer,
+        // password: user.password
 
-      // profileImg: {
-      //   data: fs.readFileSync("uploads/profile/" + req.file.filename),
-      //   contentType: "image/jpeg",
-      // },
-      //profileImg : fs.readFileSync("uploads/profile/" + req.file.filename),
-    },
-    { new: true }
-  );
+        // profileImg: {
+        //   data: fs.readFileSync("uploads/profile/" + req.file.filename),
+        //   contentType: "image/jpeg",
+        // },
+        //profileImg : fs.readFileSync("uploads/profile/" + req.file.filename),
+      },
+      { new: true }
+    );
+  } else {
+    updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        name: req.body.name,
+        role: req.body.role,
+      },
+      { new: true }
+    );
+  }
 
   res.status(200).json({
     _id: updatedUser.id,
     name: updatedUser.name,
     email: updatedUser.email,
-    farmer: updatedUser.farmer,
+    role: updatedUser.role,
     profileImg: updatedUser.profileImg,
     token: generateToken(updatedUser._id),
-    // body: req.body,
-    // file: req.file
   });
 });
 
@@ -192,12 +235,34 @@ const deleteUser = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
+// Admin change user roles
+// Route PUT /api/users/admin/roles/:id
+// access Private
+const changeRole = asyncHandler(async (req, res) => {
+
+  if(req.user.id !== req.params.id) {
+    const userChanged = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        role: req.body.role,
+      },
+    );
+  
+    res.status(200).json(userChanged);
+  } else {
+    res.status(401).json({message: 'Your role can be changed only by another admin.'})
+  }
+
+});
+
 module.exports = {
   getAllUsers,
   registerUser,
   loginUser,
+  loginAdmin,
   getMe,
   updateUser,
   deleteUser,
   getUser,
+  changeRole,
 };

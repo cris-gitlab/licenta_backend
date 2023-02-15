@@ -8,11 +8,13 @@ const {
   updateUser,
   deleteUser,
   getAllUsers,
+  changeRole,
+  loginAdmin,
 } = require("../controllers/userController");
 
 const { protect } = require("../middleware/authmiddleware");
 const uploadProfile = require("../middleware/imgMiddleware");
-//const { publicUser } = require("../middleware/publicmiddleware")
+const { protectAdmin } = require("../middleware/adminmiddleware")
 
 router.post("/",uploadProfile('profile').single('profileImg') ,registerUser).get("/", getAllUsers);
 router.post("/login", loginUser);
@@ -23,4 +25,6 @@ router
   .patch(protect, uploadProfile("profile").single("profileImg"), updateUser)
   .delete(protect, deleteUser);
 
+router.route("/admin/roles/:id").put(protectAdmin, changeRole)
+router.post('/admin/loginAdmin', loginAdmin)
 module.exports = router;

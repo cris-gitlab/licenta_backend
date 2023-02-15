@@ -13,9 +13,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add an password']
     },
-    farmer: {
-        type: Boolean,
-        default: false
+    role: {
+        type: String,
+        default: 'customer',
+        enum: ['guest', 'customer', 'producer', 'admin']
     },
     profileImg: {
         data: Buffer,
