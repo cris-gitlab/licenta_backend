@@ -16,6 +16,7 @@ app.use('/api/products', require('./routes/productRoutes'))
 app.use('/api/users', require('./routes/userRoutes'))
 app.use('/api/stores', require('./routes/storeRoutes'))
 app.use('/api/orders', require('./routes/orderRoutes'))
+app.use('/api/comments', require('./routes/commentRoutes'))
 
 app.use(errorHandler)
 
