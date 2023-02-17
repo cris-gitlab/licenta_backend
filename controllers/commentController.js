@@ -1,6 +1,4 @@
 const asyncHandler = require("express-async-handler");
-const Product = require("../models/productModel");
-const User = require("../models/userModel");
 const Comment = require("../models/commentModel")
 
 // @desc Create comment
