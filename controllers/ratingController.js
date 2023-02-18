@@ -21,6 +21,36 @@ const createRating = asyncHandler(async (req, res) => {
     res.status(200).json(rating);
 });
 
+// @desc Update rating
+// @route PATCH /api/ratings/
+// @access Private
+const updateRating = asyncHandler(async (req, res) => {
+    const foundRating = await Rating.findById(req.body._id)
+
+    if (!foundRating) {
+        res.status(401);
+        throw new Error("Rating not found.");
+    }
+
+    if (req.user.id !== req.body.userId) {
+        res.status(401);
+        throw new Error("Not authorized.");
+    }
+
+    const updatedRating = await Rating.findByIdAndUpdate(
+        req.body._id,
+        {
+            mark: req.body.mark
+        },
+        {
+            new: true,
+        }
+    )
+    
+    res.status(200).json(updatedRating);
+  });
+
+
 // @desc GET the ratings of a product
 // @route GET /api/ratings/:productId
 // @access Public
@@ -42,16 +72,17 @@ const getProductAverage = asyncHandler(async (req, res) => {
 // @access Public
 const getMyRating = asyncHandler(async (req, res) => {
     const rating = await Rating.find({ productId: req.params.productId, userId: req.user.id });
-    // if(rating) {
-    //     res.status(200).json(rating)
-    // } else {
-    //     res.status(200).json({})
-    // }
-    res.status(200).json(rating)
+    if(rating) {
+        res.status(200).json(rating)
+    } else {
+        res.status(401).json(null)
+
+    }
 });
 
 module.exports = {
     createRating,
     getProductAverage,
-    getMyRating
+    getMyRating,
+    updateRating
 }

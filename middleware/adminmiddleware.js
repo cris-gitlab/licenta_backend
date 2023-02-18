@@ -17,7 +17,7 @@ const protectAdmin = asyncHandler(async (req, res, next) => {
             req.user = await User.findById(decoded.id).select('-password')
 
             if(req.user.role !== 'admin') {
-                throw new Error('You cannot change the details of other user.')
+                throw new Error('Not authorized')
             }
             
             next()
