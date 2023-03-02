@@ -168,6 +168,23 @@ const deleteStore = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
+const changeStatus = asyncHandler(async (req, res) => {
+
+  if(req.user.role === 'admin') {
+    const userChanged = await Store.findByIdAndUpdate(
+      req.params.id,
+      {
+        active: req.body.active,
+      },
+    );
+  
+    res.status(200).json(userChanged);
+  } else {
+    res.status(401).json({message: 'Your role can be changed only by another admin.'})
+  }
+
+});
+
 module.exports = {
   getStores,
   getStore,
@@ -175,4 +192,5 @@ module.exports = {
   createStore,
   updateStore,
   deleteStore,
+  changeStatus
 };

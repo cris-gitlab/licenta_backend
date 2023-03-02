@@ -7,6 +7,7 @@ const {
   deleteProduct,
   getMyProducts,
   getProductInfo,
+  searchProducts,
 } = require("../controllers/productController");
 
 const uploadProd = require("../middleware/imgMiddleware");
@@ -24,5 +25,6 @@ router
   //.put(protect, updateProduct)
   .delete(protect, deleteProduct);
 router.route("/category").post(getProducts);
+router.route("/search").post(searchProducts)
 router.route("/myProducts/me").get(protect, getMyProducts);
 module.exports = router;

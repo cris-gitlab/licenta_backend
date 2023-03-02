@@ -17,6 +17,28 @@ const getProducts = asyncHandler(async (req, res) => {
   res.status(200).json(products);
 });
 
+
+//@desc Get all products or by category and a certain name
+//@route POST /api/products/search
+//@acces Public
+const searchProducts = asyncHandler(async (req, res) => {
+  let products
+  let filteredProducts = []
+  if(req.body.category === 'all'){
+    products = await Product.find();
+  } else {
+    products = await Product.find({category: req.body.category});
+  }
+
+  // products.map((el, index) => {
+  //   if(el.name.toLowerCase().includes(req.body.search.toLowerCase())) {
+  //     filteredProducts.push(index)
+  //   }
+  // })
+  filteredProducts = products.filter(el => el.name.includes(req.body.search))
+  res.status(200).json(filteredProducts);
+})
+
 //@desc Get a product
 //@route GET /api/products/:id
 const getProductInfo = asyncHandler(async (req, res) => {
@@ -91,12 +113,12 @@ const updateProduct = asyncHandler(async (req, res) => {
     throw new Error("User not authorized");
   }
 
-  let storePicture;
-  if (req.file) {
-    storePicture = req.file.filename;
-  } else {
-    storePicture = defaultStorePic;
-  }
+  // let storePicture;
+  // if (req.file) {
+  //   storePicture = req.file.filename;
+  // } else {
+  //   storePicture = defaultStorePic;
+  // }
 
   const updatedProduct = await Product.findByIdAndUpdate(
     req.params.id,
@@ -162,4 +184,5 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
+  searchProducts
 };
